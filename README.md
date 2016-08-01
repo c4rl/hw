@@ -2,6 +2,7 @@
 
 ## Computing
 
+* web platform - https://platform.html5.org/
 * vim
 * py - http://learnpythonthehardway.org/book/
 * r
