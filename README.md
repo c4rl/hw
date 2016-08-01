@@ -3,7 +3,7 @@
 ## Computing
 
 * vim
-* py
+* py - http://learnpythonthehardway.org/book/
 * r
 * ruby
 * nosql
@@ -34,4 +34,3 @@
 * marathon
 * triple bypass
 * copper triangle
-
