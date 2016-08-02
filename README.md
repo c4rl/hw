@@ -8,9 +8,9 @@
 * [python](./python)
 * btc
   - http://www.michaelnielsen.org/ddi/how-the-bitcoin-protocol-actually-works/
-* ruby
 * go
-* rails
+  - https://github.com/gophergala/learn-Go-the-hard-way
+* ror
 * r
 * docker
 * kubernetes
