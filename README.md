@@ -3,8 +3,8 @@
 ## Computing
 
 * web platform - https://platform.html5.org/
-* vim
-* py - http://learnpythonthehardway.org/book/
+* [vim](./vim)
+* [python](./python)
 * r
 * ruby
 * nosql
@@ -27,7 +27,9 @@
 ## Financial
 
 * personal finance - http://www.finra.org/investors/prepare-invest
-* investment finance - http://www.sipc.org/for-investors/investor-faqs
+* investment finance
+  - http://www.sipc.org/for-investors/investor-faqs
+  - http://ocw.mit.edu/courses/sloan-school-of-management/
 * time management
 
 ## Health
