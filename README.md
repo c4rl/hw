@@ -26,8 +26,8 @@
 
 ## Financial
 
-* personal finance
-* investment finance
+* personal finance - http://www.finra.org/investors/prepare-invest
+* investment finance - http://www.sipc.org/for-investors/investor-faqs
 * time management
 
 ## Health
