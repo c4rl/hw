@@ -1,4 +1,4 @@
-Currently on http://learnpythonthehardway.org/book/ex13.html
+Currently on http://learnpythonthehardway.org/book/ex24.html
 
 ## @todo
 
