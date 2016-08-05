@@ -30,6 +30,7 @@
 * vue.js
 * promises
 * react
+  - http://patternhatch.com/2016/07/06/a-primer-on-the-react-ecosystem-part-1-of-3/
 * flux - http://facebook.github.io/flux/
 * redux
 * angular
