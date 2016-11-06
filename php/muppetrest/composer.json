@@ -1,0 +1,15 @@
+{
+    "name": "c4rl/muppetrest",
+    "authors": [
+        {
+            "name": "Carl Wiedemann",
+            "email": "carl.wiedemann@gmail.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+      "psr-4": {
+        "Muppet\\": "model/"
+      }
+    }
+}

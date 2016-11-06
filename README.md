@@ -6,6 +6,7 @@
   - Service worker API - https://www.smashingmagazine.com/2016/02/making-a-service-worker/
 * [vim](./vim)
 * [python](./python)
+* backbone
 * btc
   - http://www.michaelnielsen.org/ddi/how-the-bitcoin-protocol-actually-works/
 * go
