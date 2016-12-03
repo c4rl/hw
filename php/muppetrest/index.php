@@ -14,8 +14,15 @@ function main() {
 
     case 'muppets':
 
-      $content = Muppet\Muppet::all();
-      
+      switch (method()) {
+        case 'get':
+          $content = Muppet\Muppet::all();
+          break;
+        case 'post':
+          return Muppet\Muppet::create(request_params())->getAttributes();
+          break;
+      }
+
       break;
 
     default:
@@ -28,6 +35,14 @@ function main() {
 
 function qs() {
   return $_GET;
+}
+
+function request_params() {
+  return $_REQUEST;
+}
+
+function method() {
+  return strtolower($_SERVER['REQUEST_METHOD']);
 }
 
 function route() {
