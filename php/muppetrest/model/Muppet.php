@@ -9,7 +9,9 @@ namespace Muppet;
  */
 class Muppet {
 
-  private $attributes = [];
+  protected $attributes = [];
+
+  protected static $table = 'muppets';
 
   public function __construct(array $attributes = []) {
     $this->attributes = $attributes;
@@ -38,16 +40,18 @@ class Muppet {
     $page = 1;
     $per_page = 10;
 
-    $result = static::db()->query(sprintf('SELECT rowid id,* FROM muppets LIMIT %d, %d', $page - 1, $per_page));
+    $result = static::db()->query(sprintf('SELECT * FROM %s LIMIT %d, %d', static::$table, $page - 1, $per_page));
 
     $total = 0;
-    $muppets = [];
+    $records = [];
     foreach ($result as $row) {
       $total++;
-      $muppets[] = filter_string_keys($row);
+      $records[] = filter_string_keys($row);
     }
 
-    return compact('total', 'page', 'per_page', 'muppets');
+    return compact('total', 'page', 'per_page') + [
+      static::$table => $records,
+    ];
   }
 
   /**
@@ -63,10 +67,10 @@ class Muppet {
   private function save() {
     $db = static::db();
     if (isset($this->id)) {
-      $db->query(sprintf('UPDATE muppets SET name = "%s", occupation = "%s"', $this->name, $this->occupation));
+      $db->query(sprintf('UPDATE %s SET name = "%s", occupation = "%s"', static::$table, $this->name, $this->occupation));
     }
     else {
-      $db->query(sprintf('INSERT INTO muppets (name, occupation) VALUES ("%s", "%s")', $this->name, $this->occupation));
+      $db->query(sprintf('INSERT INTO %s (name, occupation) VALUES ("%s", "%s")', static::$table, $this->name, $this->occupation));
       $this->id = $db->lastInsertId();
     }
   }

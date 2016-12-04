@@ -19,7 +19,7 @@ function main() {
           $content = Muppet\Muppet::all();
           break;
         case 'post':
-          return Muppet\Muppet::create(request_params())->getAttributes();
+          $content = Muppet\Muppet::create(request_params())->getAttributes();
           break;
       }
 
