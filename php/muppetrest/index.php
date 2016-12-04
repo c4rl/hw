@@ -21,6 +21,8 @@ function main() {
         case 'post':
           $content = Muppet\Muppet::create(request_params())->getAttributes();
           break;
+        default:
+          throw new DomainException();
       }
 
       break;
