@@ -14,13 +14,13 @@ namespace Blanket;
  */
 class App {
 
+  private $config = [];
+
+  private $route_registry = [];
+
   public function __construct(array $config = []) {
     $this->config = $config;
   }
-
-  private $config = [];
-
-  private $registry = [];
 
   public function __call($method, array $arguments) {
 
@@ -34,13 +34,20 @@ class App {
       throw new \TypeError();
     }
 
-    $this->registry[] = compact('method', 'path', 'callback');
+    $this->route_registry[] = compact('method', 'path', 'callback');
   }
 
   public static function pathMaskToRegex($path_mask) {
-    $with_regex_placeholders = preg_replace('/:[a-z]+/', '(.+?)', $path_mask);
-    $escaped = preg_replace('/\//', '\/', $with_regex_placeholders);
-    return sprintf('/^%s$/', $escaped);
+    static $cache = [];
+
+    if (!array_key_exists($path_mask, $cache)) {
+      $regex = sprintf('/^%s$/', preg_replace('/\//', '\/', preg_replace('/:[a-z]+/', '(.+?)', $path_mask)));
+    }
+    else {
+      $regex = $path_mask[$cache];
+    }
+
+    return $regex;
   }
 
   public static function pathMaskToNames($path_mask) {
@@ -52,31 +59,38 @@ class App {
     }, []);
   }
 
+  public static function requestMatchesRegistrant(array $route_registrant, Request $request) {
+    return $request->method == $route_registrant['method'] && preg_match(self::pathMaskToRegex($route_registrant['path']), $request->path);
+  }
+
+  public static function extractPathArguments(array $route_registrant, Request $request) {
+    $matches = [];
+    if (preg_match(self::pathMaskToRegex($route_registrant['path']), $request->path, $matches)) {
+      array_shift($matches);
+      return array_combine(self::pathMaskToNames($route_registrant['path']), $matches);
+    }
+    else {
+      return [];
+    }
+  }
+
   public function getResponse(Request $request) {
 
-    $matched_registrant = array_reduce($this->registry, function ($matched_registrant, $registrant) use ($request) {
-      if (isset($matched_registrant)) {
-        return $matched_registrant;
+    $matched_registrant = array_reduce($this->route_registry, function ($matched_route_registrant, $route_registrant) use ($request) {
+      if (!isset($matched_route_registrant) && self::requestMatchesRegistrant($route_registrant, $request)) {
+        $matched_route_registrant = $route_registrant + [
+          'parsed_params' => self::extractPathArguments($route_registrant, $request),
+        ];
       }
 
-      $regex = self::pathMaskToRegex($registrant['path']);
-      $mapped_names = self::pathMaskToNames($registrant['path']);
-      $matches = [];
-      if (preg_match($regex, $request->path, $matches) && $request->method == $registrant['method']) {
-        array_shift($matches);
-        $registrant['parsed_params'] = array_combine($mapped_names, $matches);
-        return $registrant;
-      }
-
-      return NULL;
-
+      return $matched_route_registrant;
     }, NULL);
 
     if (!isset($matched_registrant)) {
       throw new MissingRouteException();
     }
 
-    return call_user_func_array($matched_registrant['callback'], array_merge($matched_registrant['parsed_params'], [
+    return call_user_func_array($matched_registrant['callback'], array_merge(array_values($matched_registrant['parsed_params']), [
       $request,
     ]));
 
@@ -88,7 +102,7 @@ class App {
       $response = $this->getResponse($request);
 
       if (is_string($response)) {
-        header('Content-Type: application/json');
+        header('Content-Type: text/html');
         print $response;
       }
       elseif ($response instanceOf \SimpleXMLElement) {
@@ -118,6 +132,5 @@ class App {
     }
 
   }
-
 
 }
