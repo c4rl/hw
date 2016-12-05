@@ -32,8 +32,8 @@ $app->del('muppets/:id', function ($id, Request $request) {
 });
 
 $app->get('muppets', function (Request $request) {
-  $page = 1;
-  $per_page = 10;
+  $page = isset($request->get_data['page']) ? (int) $request->get_data['page'] : 1;
+  $per_page = isset($request->get_data['per_page']) ? (int) $request->get_data['per_page'] : 10;
   $instances = Muppet::all($page, $per_page);
   $total = count($instances);
   $muppets = array_map(function (Muppet $muppet) {

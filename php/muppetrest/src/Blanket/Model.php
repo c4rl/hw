@@ -38,8 +38,10 @@ class Model {
 
   public static function all($page = 1, $per_page = 10) {
 
+    $start = ($page - 1) * $per_page;
+
     $result = static::db()
-      ->query(sprintf('SELECT * FROM %s LIMIT %d, %d', static::$table, $page - 1, $per_page));
+      ->query(sprintf('SELECT * FROM %s LIMIT %d, %d', static::$table, $start, $per_page));
 
     $instances = [];
     while ($row = $result->fetch(\PDO::FETCH_ASSOC)) {
