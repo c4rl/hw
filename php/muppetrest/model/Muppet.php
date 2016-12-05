@@ -3,18 +3,20 @@
 namespace Muppet;
 
 /**
- * @property mixed occupation
- * @property mixed name
- * @property mixed id
+ * @property string occupation
+ * @property string name
+ * @property int id
  */
 class Muppet {
 
   protected $attributes = [];
 
+  protected $original_attributes = [];
+
   protected static $table = 'muppets';
 
   public function __construct(array $attributes = []) {
-    $this->attributes = $attributes;
+    $this->original_attributes = $this->attributes = $attributes;
   }
 
   public static function findOrFail($id) {
@@ -90,10 +92,38 @@ class Muppet {
       $db->query(sprintf('INSERT INTO %s (name, occupation) VALUES ("%s", "%s")', static::$table, $this->name, $this->occupation));
       $this->id = $db->lastInsertId();
     }
+    return $this;
+  }
+
+  public function update(array $attributes) {
+    foreach ($attributes as $key => $value) {
+      $this->$key = $value;
+    }
+    return $this;
   }
 
   public function getAttributes() {
     return $this->attributes;
+  }
+
+  public function hasChanged() {
+    return $this->attributes != $this->original_attributes;
+  }
+
+  public function saveIfChanged() {
+    if ($this->hasChanged()) $this->save();
+    return $this;
+  }
+
+  public function delete() {
+    $db = static::db();
+    if (isset($this->id)) {
+      $db->query(sprintf('DELETE FROM %s WHERE id = %d', static::$table, $this->id));
+      return $this;
+    }
+    else {
+      throw new \LogicException();
+    }
   }
 
 }
