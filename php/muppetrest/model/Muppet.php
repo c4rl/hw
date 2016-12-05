@@ -17,6 +17,17 @@ class Muppet {
     $this->attributes = $attributes;
   }
 
+  public static function findOrFail($id) {
+    $db = static::db();
+    /** @var \PDOStatement $result */
+    $result = $db->query(sprintf('SELECT * FROM %s WHERE id = %d LIMIT 0, 1', static::$table, $id));
+    if ($row = $result->fetch(\PDO::FETCH_ASSOC)) {
+      $instance = new static($row);
+      return $instance;
+    }
+    throw new RecordNotFoundException();
+  }
+
   public function __get($name) {
     return $this->attributes[$name];
   }
@@ -35,6 +46,12 @@ class Muppet {
     return $pdo;
   }
 
+  public static function filterStringKeys(array $row) {
+    return array_filter($row, function ($value, $key) {
+      return !is_numeric($key);
+    }, ARRAY_FILTER_USE_BOTH);
+  }
+
   public static function all() {
 
     $page = 1;
@@ -46,7 +63,7 @@ class Muppet {
     $records = [];
     foreach ($result as $row) {
       $total++;
-      $records[] = filter_string_keys($row);
+      $records[] = self::filterStringKeys($row);
     }
 
     return compact('total', 'page', 'per_page') + [
