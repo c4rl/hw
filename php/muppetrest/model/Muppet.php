@@ -81,10 +81,10 @@ class Muppet {
     return $instance;
   }
 
-  private function save() {
+  public function save() {
     $db = static::db();
     if (isset($this->id)) {
-      $db->query(sprintf('UPDATE %s SET name = "%s", occupation = "%s"', static::$table, $this->name, $this->occupation));
+      $db->query(sprintf('UPDATE %s SET name = "%s", occupation = "%s" WHERE id = %d', static::$table, $this->name, $this->occupation, $this->id));
     }
     else {
       $db->query(sprintf('INSERT INTO %s (name, occupation) VALUES ("%s", "%s")', static::$table, $this->name, $this->occupation));

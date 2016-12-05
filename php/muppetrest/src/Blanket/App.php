@@ -8,7 +8,7 @@ use Muppet\RecordNotFoundException;
  *
  * @method get($path, \Closure $closure)
  * @method post($path, \Closure $closure)
- * @method put
+ * @method put($path, \Closure $closure)
  * @method delete
  *
  * @package Blanket
