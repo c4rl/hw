@@ -1,7 +1,6 @@
 <?php
 
 namespace Blanket;
-use Muppet\RecordNotFoundException;
 
 /**
  * Class App
@@ -14,6 +13,12 @@ use Muppet\RecordNotFoundException;
  * @package Blanket
  */
 class App {
+
+  public function __construct(array $config = []) {
+    $this->config = $config;
+  }
+
+  private $config = [];
 
   private $registry = [];
 
@@ -68,7 +73,7 @@ class App {
     }, NULL);
 
     if (!isset($matched_registrant)) {
-      throw new \LogicException();
+      throw new MissingRouteException();
     }
 
     return call_user_func_array($matched_registrant['callback'], array_merge($matched_registrant['parsed_params'], [
@@ -97,7 +102,19 @@ class App {
 
     }
     catch (\Exception $e) {
-      header($request->protocol . ' 500 Internal Server Error', TRUE, 500);
+      $original_exception_class = get_class($e);
+      if (isset($this->config['exception_map'][$original_exception_class])) {
+        /** @var \Exception $mapped_exception_class */
+        $mapped_exception_class = $this->config['exception_map'][$original_exception_class];
+        $mapped_exception = new $mapped_exception_class();
+      }
+      else {
+        $mapped_exception = new Http500Exception();
+      }
+      $exception_header_message = sprintf('%s %s %s', $request->protocol, $mapped_exception->getCode(), $mapped_exception->getMessage());
+      header('Content-Type: text/html');
+      header($exception_header_message, TRUE, $mapped_exception->getCode());
+      print $exception_header_message;
     }
 
   }
