@@ -37,7 +37,14 @@ $app->del('muppets/:id', function ($id, Request $request) {
 });
 
 $app->get('muppets', function (Request $request) {
-  return Muppet::all();
+  $page = 1;
+  $per_page = 10;
+  $instances = Muppet::all($page, $per_page);
+  $total = count($instances);
+  $muppets = array_map(function (Muppet $muppet) {
+    return $muppet->getAttributes();
+  }, $instances);
+  return compact('total', 'page', 'per_page', 'muppets');
 });
 
 $app->run(Request::createFromGlobals());

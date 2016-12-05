@@ -54,23 +54,16 @@ class Muppet {
     }, ARRAY_FILTER_USE_BOTH);
   }
 
-  public static function all() {
-
-    $page = 1;
-    $per_page = 10;
+  public static function all($page = 1, $per_page = 10) {
 
     $result = static::db()->query(sprintf('SELECT * FROM %s LIMIT %d, %d', static::$table, $page - 1, $per_page));
 
-    $total = 0;
-    $records = [];
-    foreach ($result as $row) {
-      $total++;
-      $records[] = self::filterStringKeys($row);
+    $instances = [];
+    while ($row = $result->fetch(\PDO::FETCH_ASSOC)) {
+      $instances[] = new static($row);
     }
 
-    return compact('total', 'page', 'per_page') + [
-      static::$table => $records,
-    ];
+    return $instances;
   }
 
   /**
