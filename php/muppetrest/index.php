@@ -10,7 +10,7 @@ define('WEBROOT', __DIR__);
 
 $app = new App([
   'exception_map' => [
-    \Muppet\RecordNotFoundException::class => \Blanket\Http404Exception::class,
+    \Blanket\RecordNotFoundException::class => \Blanket\Http404Exception::class,
     \Blanket\MissingRouteException::class => \Blanket\Http404Exception::class,
   ],
 ]);
