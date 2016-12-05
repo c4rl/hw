@@ -8,12 +8,7 @@ require 'vendor/autoload.php';
 
 define('WEBROOT', __DIR__);
 
-$app = new App([
-  'exception_map' => [
-    \Blanket\RecordNotFoundException::class => \Blanket\Http404Exception::class,
-    \Blanket\MissingRouteException::class => \Blanket\Http404Exception::class,
-  ],
-]);
+$app = new App();
 
 $app->post('muppets', function (Request $request) {
   return Muppet::create($request->post_data)->getAttributes();

@@ -18,8 +18,15 @@ class App {
 
   private $route_registry = [];
 
+  private $default_config = [
+    'exception_map' => [
+      \Blanket\RecordNotFoundException::class => \Blanket\Http404Exception::class,
+      \Blanket\MissingRouteException::class => \Blanket\Http404Exception::class,
+    ],
+  ];
+
   public function __construct(array $config = []) {
-    $this->config = $config;
+    $this->config = $config + $this->default_config;
   }
 
   public function __call($method, array $arguments) {
