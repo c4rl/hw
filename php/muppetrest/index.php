@@ -1,6 +1,7 @@
 <?php
 
 use Blanket\App;
+use Blanket\Db;
 use Blanket\Request;
 use Muppet\Muppet;
 
@@ -8,7 +9,12 @@ require 'vendor/autoload.php';
 
 define('WEBROOT', __DIR__);
 
-$app = new App();
+$app = new App([
+  'models' => [
+    Muppet::class,
+  ],
+  'storage' => (new Db(sprintf('sqlite:%s/storage/db.sqlite', WEBROOT))),
+]);
 
 $app->post('muppets', function (Request $request) {
   return Muppet::create($request->post_data)->getAttributes();
@@ -20,7 +26,7 @@ $app->get('muppets/:id', function ($id, Request $request) {
 
 $app->put('muppets/:id', function ($id, Request $request) {
   return Muppet::findOrFail($id)
-    ->update($request->put_data)
+    ->updateAttributes($request->put_data)
     ->saveIfChanged()
     ->getAttributes();
 });

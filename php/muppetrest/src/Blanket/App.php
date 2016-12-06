@@ -3,32 +3,94 @@
 namespace Blanket;
 
 /**
- * Class App
+ * Class App.
  *
- * @method get($path, \Closure $closure)
- * @method post($path, \Closure $closure)
- * @method put($path, \Closure $closure)
- * @method del($path, \Closure $closure)
+ * @method get($path, \Closure $closure) Registers handler for GET request.
+ * @method post($path, \Closure $closure) Registers handler for POST request.
+ * @method put($path, \Closure $closure) Registers handler for PUT request.
+ * @method del($path, \Closure $closure) Degisters handler for DEL request.
  *
  * @package Blanket
  */
 class App {
 
+  /**
+   * Key-value storage of configuration.
+   *
+   * @var array
+   */
   private $config = [];
 
+  /**
+   * Registry for various routes.
+   *
+   * @var array
+   *   Array of route arrays with 'method', 'path', and 'callback' params.
+   */
   private $route_registry = [];
 
+  /**
+   * Default configuration for web app.
+   *
+   * Parameters include:
+   *  - exception_map: Key-value array of internal exception class names mapping
+   *    to HTTP exceptions classes that should be thrown instead.
+   *  - models: Array of FQCNs that should have schema registered with storage.
+   *  - storage: Instance of Db.
+   *
+   * @var array
+   *   Default configuration array.
+   */
   private $default_config = [
     'exception_map' => [
       \Blanket\RecordNotFoundException::class => \Blanket\Http404Exception::class,
       \Blanket\MissingRouteException::class => \Blanket\Http404Exception::class,
     ],
+    'models' => [],
+    'storage' => NULL,
   ];
 
+  /**
+   * App constructor.
+   *
+   * @param array $config
+   *   Configuration options.
+   */
   public function __construct(array $config = []) {
     $this->config = $config + $this->default_config;
+    if (isset($this->config['storage'])) {
+      $this->registerStorageModels();
+    }
   }
 
+  /**
+   * Registers models with the storage mechanism.
+   */
+  private function registerStorageModels() {
+    /** @var Db $storage */
+    $storage = $this->config['storage'];
+    foreach ($this->config['models'] as $class_name) {
+      $storage->registerSchema($class_name);
+      $class_name::$storage = $storage;
+    }
+  }
+
+
+  /**
+   * Caller for specific HTTP methods.
+   *
+   * @param string $method
+   *   Method name, i.e. 'get', 'post', 'put', 'del'.
+   *
+   * @param array $arguments
+   *   Arguments passed to method.
+   *
+   * @throws \TypeError
+   *   If path and callback aren't properly passed.
+   *
+   * @throws \ArgumentCountError
+   *   If path and callback aren't properly passed.
+   */
   public function __call($method, array $arguments) {
 
     if (count($arguments) != 2) {
@@ -37,26 +99,42 @@ class App {
 
     list($path, $callback) = $arguments;
 
-    if (!($callback instanceof \Closure)) {
+    if (!is_string($path) || !($callback instanceof \Closure)) {
       throw new \TypeError();
     }
 
     $this->route_registry[] = compact('method', 'path', 'callback');
   }
 
+  /**
+   * Converts a path mask to a matching regex.
+   *
+   * @param string $path_mask
+   *   Path mask, e.g. "some/path/:param1/:param2/and/:param3"
+   *
+   * @return string
+   *   Regex string.
+   */
   public static function pathMaskToRegex($path_mask) {
     static $cache = [];
 
     if (!array_key_exists($path_mask, $cache)) {
       $regex = sprintf('/^%s$/', preg_replace('/\//', '\/', preg_replace('/:[a-z]+/', '(.+?)', $path_mask)));
-    }
-    else {
-      $regex = $path_mask[$cache];
+      $cache[$path_mask] = $regex;
     }
 
-    return $regex;
+    return $cache[$path_mask];
   }
 
+  /**
+   * Extracts array of param names from path mask.
+   *
+   * @param string $path_mask
+   *   Path mask, e.g. "some/path/:param1/:param2/and/:param3"
+   *
+   * @return array
+   *  Array of path names, e.g. ['param1', 'param2', 'param3'].
+   */
   public static function pathMaskToNames($path_mask) {
     $pieces = explode('/', $path_mask);
     return array_reduce($pieces, function (array $names, $piece) {
@@ -66,10 +144,32 @@ class App {
     }, []);
   }
 
+  /**
+   * Whether the given route registrant matches the given request.
+   *
+   * @param array $route_registrant
+   *   The registered route array, includes keys 'path', 'method', 'callback'.
+   * @param Request $request
+   *   Request.
+   *
+   * @return bool
+   *   TRUE if registrant matches, FALSE otherwise.
+   */
   public static function requestMatchesRegistrant(array $route_registrant, Request $request) {
     return $request->method == $route_registrant['method'] && preg_match(self::pathMaskToRegex($route_registrant['path']), $request->path);
   }
 
+  /**
+   * Extracted arguments from the given request and registrant.
+   *
+   * @param array $route_registrant
+   *   The registered route array, includes keys 'path', 'method', 'callback'.
+   * @param \Blanket\Request $request
+   *   Request.
+   *
+   * @return array
+   *   Key-value pairs of given path arguments.
+   */
   public static function extractPathArguments(array $route_registrant, Request $request) {
     $matches = [];
     if (preg_match(self::pathMaskToRegex($route_registrant['path']), $request->path, $matches)) {
@@ -81,6 +181,15 @@ class App {
     }
   }
 
+  /**
+   * Response from route registrant callback given request parameters.
+   *
+   * @param Request $request
+   *   Request.
+   *
+   * @return mixed
+   *   Value of registrant callback given request parameters.
+   */
   public function getResponse(Request $request) {
 
     $matched_registrant = array_reduce($this->route_registry, function ($matched_route_registrant, $route_registrant) use ($request) {
@@ -103,7 +212,14 @@ class App {
 
   }
 
+  /**
+   * Runs the app given a request. Will set headers and print response.
+   *
+   * @param Request $request
+   */
   public function run(Request $request) {
+
+    header('Cache-Control: no-cache, no-store, must-revalidate');
 
     try {
       $response = $this->getResponse($request);
@@ -124,17 +240,21 @@ class App {
     }
     catch (\Exception $e) {
       $original_exception_class = get_class($e);
+      // If we have remapped the thrown exception type, use that exception.
       if (isset($this->config['exception_map'][$original_exception_class])) {
-        /** @var \Exception $mapped_exception_class */
         $mapped_exception_class = $this->config['exception_map'][$original_exception_class];
+        /** @var \Exception $mapped_exception */
         $mapped_exception = new $mapped_exception_class();
       }
       else {
         $mapped_exception = new Http500Exception();
       }
+
       $exception_header_message = sprintf('%s %s %s', $request->protocol, $mapped_exception->getCode(), $mapped_exception->getMessage());
+
       header('Content-Type: text/html');
       header($exception_header_message, TRUE, $mapped_exception->getCode());
+
       print $exception_header_message;
     }
 

@@ -2,19 +2,62 @@
 
 namespace Blanket;
 
+/**
+ * Class Request.
+ *
+ * @package Blanket
+ */
 class Request {
 
+  /**
+   * Path of request.
+   *
+   * @var string.
+   */
   public $path;
 
+  /**
+   * HTTP method, lowercase.
+   *
+   * @var string
+   */
   public $method;
 
+  /**
+   * Key-values from POST request.
+   *
+   * @var array
+   */
   public $post_data;
+
+  /**
+   * Key-values from GET request.
+   *
+   * @var array
+   */
   public $get_data;
+
+  /**
+   * Key-values from PUT request.
+   *
+   * @var array
+   */
   public $put_data;
 
+  /**
+   * Protocol of server, $_SERVER['SERVER_PROTOCOL'].
+   *
+   * @var string
+   */
   public $protocol;
 
-  public static function readPutData() {
+  /**
+   * Reads raw JSON from PUT data into array.
+   *
+   * @return array
+   *   Key-value of PUT data.
+   */
+  private static function readPutData() {
     $h = fopen('php://input', 'r');
     $json = '';
     while ($chunk = fread($h, 1024)) {
@@ -25,6 +68,13 @@ class Request {
     return json_decode($json, TRUE);
   }
 
+  /**
+   * @param array $globals
+   *   Optional globals for construction.
+   *
+   * @return Request
+   *   Created instance.
+   */
   public static function createFromGlobals($globals = NULL) {
     if (!isset($globals)) {
       $globals = $_SERVER;
@@ -43,4 +93,5 @@ class Request {
 
     return $instance;
   }
+
 }
