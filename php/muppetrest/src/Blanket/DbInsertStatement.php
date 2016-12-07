@@ -14,18 +14,19 @@ class DbInsertStatement extends DbStatement {
    */
   protected function getSqlStatement() {
 
-    $column_names = implode(', ', array_keys($this->fields));
+    $name_pieces = [];
+    $placeholder_pieces = [];
 
     foreach ($this->fields as $key => $value) {
-      $this->addPlaceholder($key, $value);
+      $data = $this->addPlaceholder($key, $value);
+      $name_pieces[] = $key;
+      $placeholder_pieces[] = $data['placeholder'];
     }
-
-    $column_placeholders = implode(', ', array_keys($this->getPlaceholders()));
 
     return trim(strtr('INSERT INTO ___TABLE___ (___COLUMN_NAMES___) VALUES (___VALUES___)', [
       '___TABLE___' => $this->table,
-      '___COLUMN_NAMES___' => $column_names,
-      '___VALUES___' => $column_placeholders,
+      '___COLUMN_NAMES___' => implode(', ', $name_pieces),
+      '___VALUES___' => implode(', ', $placeholder_pieces),
     ]));
   }
 

@@ -14,17 +14,15 @@ class DbUpdateStatement extends DbStatement {
    */
   protected function getSqlStatement() {
 
-    $fields_pieces = [];
+    $field_updates = [];
     foreach ($this->fields as $key => $value) {
       $data = $this->addPlaceholder($key, $value);
-      $fields_pieces[] = sprintf('%s = %s', $data['name'], $data['placeholder']);
+      $field_updates[] = sprintf('%s = %s', $data['name'], $data['placeholder']);
     }
-
-    $fields_string = implode(', ', $fields_pieces);
 
     return trim(strtr('UPDATE ___TABLE___ SET ___FIELDS___ ___CONDITIONS___', [
       '___TABLE___' => $this->table,
-      '___FIELDS___' => $fields_string,
+      '___FIELDS___' => implode(', ', $field_updates),
       '___CONDITIONS___' => $this->getConditionsString(),
     ]));
   }

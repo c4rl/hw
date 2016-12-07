@@ -131,25 +131,14 @@ abstract class DbStatement {
    *   Placeholder data with 'placeholder', 'name', 'value'.
    */
   protected function addPlaceholder($key, $value) {
-    $placeholder = sprintf(':placeholder_%d', count($this->placeholders));
     $data = [
-      'placeholder' => $placeholder,
+      'placeholder' => sprintf(':placeholder_%d', count($this->placeholders)),
       'name' => $key,
       'value' => $value,
     ];
-    $this->placeholders[$placeholder] = $data;
+    $this->placeholders[] = $data;
 
     return $data;
-  }
-
-  /**
-   * Getter for all placeholders.
-   *
-   * @return array
-   *   Array of placeholder data.
-   */
-  protected function getPlaceholders() {
-    return $this->placeholders;
   }
 
   /**
@@ -160,9 +149,9 @@ abstract class DbStatement {
    */
   protected function bindPlaceholders() {
     $schema = $this->getSchema();
-    foreach ($this->placeholders as $placeholder => $data) {
+    foreach ($this->placeholders as $data) {
       $type = $schema[$data['name']]['type'];
-      $this->statement->bindValue($placeholder, $data['value'], $type);
+      $this->statement->bindValue($data['placeholder'], $data['value'], $type);
     }
     return $this;
   }
