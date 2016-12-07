@@ -88,7 +88,6 @@ class Db {
     return $this->schema_registry[$cache_key];
   }
 
-
   /**
    * Performs static query.
    *
@@ -161,6 +160,19 @@ class Db {
    */
   public function delete($table) {
     return new DbDeleteStatement($table, $this);
+  }
+
+  /**
+   * Factory for SELECT statement query.
+   *
+   * @param string $table
+   *   Name of table to query.
+   *
+   * @return DbSelectStatement
+   *   Select statement.
+   */
+  public function select($table) {
+    return new DbSelectStatement($table, $this);
   }
 
 }

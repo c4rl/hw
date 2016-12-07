@@ -43,6 +43,7 @@ abstract class DbStatement {
    * @var \PDOStatement
    */
   protected $statement;
+
   /**
    * Conditions array.
    *
@@ -73,7 +74,7 @@ abstract class DbStatement {
    * @param string $operator
    *   Comparison operator, defaults to '<'.
    *
-   * @return DbUpdateStatement
+   * @return $this
    *   Self.
    */
   public function condition($key, $value, $operator = '=') {
@@ -82,6 +83,16 @@ abstract class DbStatement {
     $this->conditions[] = sprintf('(%s %s %s)', $data['name'], $operator, $data['placeholder']);
 
     return $this;
+  }
+
+  /**
+   * Executes statement.
+   *
+   * @return bool
+   *   TRUE on success, FALSE otherwise.
+   */
+  public function execute() {
+    return $this->prepare($this->getSqlStatement())->bindPlaceholders()->statement->execute();
   }
 
   /**
@@ -167,16 +178,17 @@ abstract class DbStatement {
    */
   protected function prepare($sql) {
     $this->statement = $this->db->prepare($sql);
+
     return $this;
   }
 
   /**
-   * Executes statement.
+   * Builds query-specific SQL statement.
    *
-   * @return bool
-   *   TRUE on success, FALSE otherwise.
+   * @return string
+   *   SQL string.
    */
-  abstract public function execute();
+  abstract protected function getSqlStatement();
 
   /**
    * Get full conditions string.

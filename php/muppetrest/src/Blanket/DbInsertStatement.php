@@ -12,7 +12,7 @@ class DbInsertStatement extends DbStatement {
   /**
    * {@inheritdoc}
    */
-  public function execute() {
+  protected function getSqlStatement() {
 
     $column_names = implode(', ', array_keys($this->fields));
 
@@ -22,13 +22,11 @@ class DbInsertStatement extends DbStatement {
 
     $column_placeholders = implode(', ', array_keys($this->getPlaceholders()));
 
-    $sql = trim(strtr('INSERT INTO ___TABLE___ (___COLUMN_NAMES___) VALUES (___VALUES___)', [
+    return trim(strtr('INSERT INTO ___TABLE___ (___COLUMN_NAMES___) VALUES (___VALUES___)', [
       '___TABLE___' => $this->table,
       '___COLUMN_NAMES___' => $column_names,
       '___VALUES___' => $column_placeholders,
     ]));
-
-    return $this->prepare($sql)->bindPlaceholders()->statement->execute();
   }
 
 }

@@ -216,10 +216,14 @@ class Model {
    *   If record not found.
    */
   public static function findOrFail($id) {
-    /** @var \PDOStatement $result */
-    $result = static::$storage->query(sprintf('SELECT * FROM %s WHERE id = %d LIMIT 0, 1', static::$table, $id));
-    if ($row = $result->fetch(\PDO::FETCH_ASSOC)) {
-      $instance = new static($row);
+
+    $rows = static::$storage->select(static::$table)
+      ->condition('id', $id)
+      ->range(0, 1)
+      ->executeAndFetchAll();
+
+    if (!empty($rows)) {
+      $instance = new static($rows[0]);
       return $instance;
     }
     throw new RecordNotFoundException();
@@ -239,11 +243,12 @@ class Model {
 
     $start = ($page - 1) * $per_page;
 
-    $result = static::$storage
-      ->query(sprintf('SELECT * FROM %s LIMIT %d, %d', static::$table, $start, $per_page));
+    $rows = static::$storage->select(static::$table)
+      ->range($start, $per_page)
+      ->executeAndFetchAll();
 
     $instances = [];
-    while ($row = $result->fetch(\PDO::FETCH_ASSOC)) {
+    foreach ($rows as $row) {
       $instances[] = new static($row);
     }
 

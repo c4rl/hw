@@ -12,14 +12,11 @@ class DbDeleteStatement extends DbStatement {
   /**
    * {@inheritdoc}
    */
-  public function execute() {
-
-    $sql = trim(strtr('DELETE FROM ___TABLE___ ___CONDITIONS___', [
+  protected function getSqlStatement() {
+    return trim(strtr('DELETE FROM ___TABLE___ ___CONDITIONS___', [
       '___TABLE___' => $this->table,
       '___CONDITIONS___' => $this->getConditionsString(),
     ]));
-
-    $this->prepare($sql)->bindPlaceholders()->statement->execute();
   }
 
 }

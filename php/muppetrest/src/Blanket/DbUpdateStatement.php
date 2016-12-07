@@ -12,7 +12,7 @@ class DbUpdateStatement extends DbStatement {
   /**
    * {@inheritdoc}
    */
-  public function execute() {
+  protected function getSqlStatement() {
 
     $fields_pieces = [];
     foreach ($this->fields as $key => $value) {
@@ -22,13 +22,11 @@ class DbUpdateStatement extends DbStatement {
 
     $fields_string = implode(', ', $fields_pieces);
 
-    $sql = trim(strtr('UPDATE ___TABLE___ SET ___FIELDS___ ___CONDITIONS___', [
+    return trim(strtr('UPDATE ___TABLE___ SET ___FIELDS___ ___CONDITIONS___', [
       '___TABLE___' => $this->table,
       '___FIELDS___' => $fields_string,
       '___CONDITIONS___' => $this->getConditionsString(),
     ]));
-
-    return $this->prepare($sql)->bindPlaceholders()->statement->execute();
   }
 
 }
