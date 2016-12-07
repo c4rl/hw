@@ -10,34 +10,6 @@ namespace Blanket;
 class DbUpdateStatement extends DbStatement {
 
   /**
-   * Conditions array.
-   *
-   * @var string[]
-   */
-  private $conditions = [];
-
-  /**
-   * Provides a condition for the SQL statement.
-   *
-   * @param string $key
-   *   Name of column.
-   * @param mixed $value
-   *   Value to match.
-   * @param string $operator
-   *   Comparison operator, defaults to '<'.
-   *
-   * @return $this
-   *   Self.
-   */
-  public function condition($key, $value, $operator = '=') {
-    $data = $this->addPlaceholder($key, $value);
-
-    $this->conditions[] = sprintf('(%s %s %s)', $data['name'], $operator, $data['placeholder']);
-
-    return $this;
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function execute() {
@@ -50,12 +22,10 @@ class DbUpdateStatement extends DbStatement {
 
     $fields_string = implode(', ', $fields_pieces);
 
-    $conditions_string = count($this->conditions) > 0 ? sprintf('WHERE %s', implode(' AND ', $this->conditions)) : '';
-
     $sql = trim(strtr('UPDATE ___TABLE___ SET ___FIELDS___ ___CONDITIONS___', [
       '___TABLE___' => $this->table,
       '___FIELDS___' => $fields_string,
-      '___CONDITIONS___' => $conditions_string,
+      '___CONDITIONS___' => $this->getConditionsString(),
     ]));
 
     return $this->prepare($sql)->bindPlaceholders()->statement->execute();

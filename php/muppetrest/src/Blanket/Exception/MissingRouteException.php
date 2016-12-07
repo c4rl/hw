@@ -1,6 +1,6 @@
 <?php
 
-namespace Blanket;
+namespace Blanket\Exception;
 
 /**
  * Class MissingRouteException.

@@ -2,6 +2,9 @@
 
 namespace Blanket;
 
+use Blanket\Exception\Http500Exception;
+use Blanket\Exception\MissingRouteException;
+
 /**
  * Class App.
  *
@@ -43,8 +46,8 @@ class App {
    */
   private $default_config = [
     'exception_map' => [
-      \Blanket\RecordNotFoundException::class => \Blanket\Http404Exception::class,
-      \Blanket\MissingRouteException::class => \Blanket\Http404Exception::class,
+      \Blanket\Exception\RecordNotFoundException::class => \Blanket\Exception\Http404Exception::class,
+      \Blanket\Exception\MissingRouteException::class => \Blanket\Exception\Http404Exception::class,
     ],
     'models' => [],
     'storage' => NULL,

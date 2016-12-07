@@ -144,10 +144,23 @@ class Db {
    *   Name of table to query.
    *
    * @return DbUpdateStatement
-   *   Insert statement.
+   *   Update statement.
    */
   public function update($table) {
     return new DbUpdateStatement($table, $this);
+  }
+
+  /**
+   * Factory for DELETE statement query.
+   *
+   * @param string $table
+   *   Name of table to query.
+   *
+   * @return DbDeleteStatement
+   *   Delete statement.
+   */
+  public function delete($table) {
+    return new DbDeleteStatement($table, $this);
   }
 
 }

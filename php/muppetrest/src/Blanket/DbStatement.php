@@ -43,6 +43,12 @@ abstract class DbStatement {
    * @var \PDOStatement
    */
   protected $statement;
+  /**
+   * Conditions array.
+   *
+   * @var string[]
+   */
+  protected $conditions = [];
 
   /**
    * DbStatement constructor.
@@ -55,6 +61,27 @@ abstract class DbStatement {
   public function __construct($table, Db $db) {
     $this->table = $table;
     $this->db = $db;
+  }
+
+  /**
+   * Provides a condition for the SQL statement.
+   *
+   * @param string $key
+   *   Name of column.
+   * @param mixed $value
+   *   Value to match.
+   * @param string $operator
+   *   Comparison operator, defaults to '<'.
+   *
+   * @return DbUpdateStatement
+   *   Self.
+   */
+  public function condition($key, $value, $operator = '=') {
+    $data = $this->addPlaceholder($key, $value);
+
+    $this->conditions[] = sprintf('(%s %s %s)', $data['name'], $operator, $data['placeholder']);
+
+    return $this;
   }
 
   /**
@@ -150,5 +177,15 @@ abstract class DbStatement {
    *   TRUE on success, FALSE otherwise.
    */
   abstract public function execute();
+
+  /**
+   * Get full conditions string.
+   *
+   * @return string
+   *   Full SQL conditions string.
+   */
+  protected function getConditionsString() {
+    return count($this->conditions) > 0 ? sprintf('WHERE %s', implode(' AND ', $this->conditions)) : '';
+  }
 
 }

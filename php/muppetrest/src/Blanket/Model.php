@@ -2,6 +2,8 @@
 
 namespace Blanket;
 
+use Blanket\Exception\RecordNotFoundException;
+
 /**
  * Class Model.
  *
@@ -194,7 +196,9 @@ class Model {
       throw new \LogicException();
     }
 
-    static::$storage->query(sprintf('DELETE FROM %s WHERE id = %d', static::$table, $this->id));
+    static::$storage->delete(static::$table)
+      ->condition('id', $this->id)
+      ->execute();
 
     return $this;
   }
