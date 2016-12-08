@@ -92,7 +92,10 @@ abstract class DbStatement {
    *   TRUE on success, FALSE otherwise.
    */
   public function execute() {
-    return $this->prepare($this->getSqlStatement())->bindPlaceholders()->statement->execute();
+    $sql = $this->getSqlStatement();
+    $this->prepare($sql);
+    $this->bindPlaceholders();
+    return $this->statement->execute();
   }
 
   /**
@@ -116,6 +119,7 @@ abstract class DbStatement {
    */
   public function fields(array $fields) {
     $this->fields = $fields;
+
     return $this;
   }
 
@@ -153,6 +157,7 @@ abstract class DbStatement {
       $type = $schema[$data['name']]['type'];
       $this->statement->bindValue($data['placeholder'], $data['value'], $type);
     }
+
     return $this;
   }
 

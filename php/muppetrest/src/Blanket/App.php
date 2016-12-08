@@ -78,7 +78,6 @@ class App {
     }
   }
 
-
   /**
    * Caller for specific HTTP methods.
    *
