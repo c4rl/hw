@@ -57,7 +57,7 @@ class Request {
    * @return array
    *   Key-value of PUT data.
    */
-  private static function readPutData() {
+  private static function readInputData() {
     $h = fopen('php://input', 'r');
     $json = '';
     while ($chunk = fread($h, 1024)) {
@@ -77,10 +77,21 @@ class Request {
    */
   public static function createFromGlobals($globals = NULL) {
     if (!isset($globals)) {
-      $globals = $_SERVER;
-      $globals['_POST_DATA'] = $_POST;
-      $globals['_GET_DATA'] = $_GET;
-      $globals['_PUT_DATA'] = $globals['REQUEST_METHOD'] == 'PUT' ? self::readPutData() : NULL;
+      $globals = $_SERVER + [
+        '_GET_DATA' => $_GET,
+        '_POST_DATA' => NULL,
+        '_PUT_DATA' => NULL,
+      ];
+
+      switch ($globals['REQUEST_METHOD']) {
+        case 'POST':
+          $globals['_POST_DATA'] = preg_match('/application\/x-www-form-urlencoded/', $_SERVER['CONTENT_TYPE']) ? $_POST : self::readInputData();
+          break;
+
+        case 'PUT':
+          $globals['_PUT_DATA'] = $globals['REQUEST_METHOD'] == 'PUT' ? self::readInputData() : NULL;
+          break;
+      }
     }
 
     $instance = new self();

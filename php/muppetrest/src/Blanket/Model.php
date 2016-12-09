@@ -10,6 +10,7 @@ use Blanket\Exception\RecordNotFoundException;
  * @package Blanket
  */
 class Model {
+  use SchemaTrait;
 
   /**
    * Array of attributes.
@@ -39,6 +40,36 @@ class Model {
    */
   public static $storage;
 
+  public static $schema;
+
+  /**
+   * Registers schema of given model class name.
+   *
+   * @param string $model_class_name
+   *   FQCN of model class.
+   *
+   * @return array
+   *   Schema array keyed by field with 'name' and 'type'.
+   */
+  public static function registerSchema() {
+    if (isset(static::$schema)) return static::$schema;
+
+    $reflection = new \ReflectionClass(get_called_class());
+    $lines = explode(PHP_EOL, $reflection->getDocComment());
+
+    return static::$schema = array_reduce($lines, function (array $schema, $line) {
+
+      $matches = [];
+      if (preg_match('/^\* @property ([^ ]+) ([^ ]+) ?.*$/', trim($line), $matches)) {
+        $name = preg_replace('/[^a-z]/i', '', $matches[2]);
+        $type = $matches[1];
+        $schema[$name] = compact('name', 'type');
+      }
+
+      return $schema;
+    }, []);
+  }
+
   /**
    * Model constructor.
    *
@@ -46,7 +77,7 @@ class Model {
    *   Attributes.
    */
   public function __construct(array $attributes = []) {
-    $this->original_attributes = $this->attributes = $attributes;
+    $this->original_attributes = $this->attributes = static::coerceAttributes($attributes, static::$schema);
   }
 
   /**
@@ -82,7 +113,7 @@ class Model {
    *   Attribute value to set.
    */
   public function __set($name, $value) {
-    $this->attributes[$name] = $value;
+    $this->attributes[$name] = self::coerceType($name, $value, static::$schema);
   }
 
   /**

@@ -11,7 +11,7 @@ use Blanket\Exception\MissingRouteException;
  * @method get($path, \Closure $closure) Registers handler for GET request.
  * @method post($path, \Closure $closure) Registers handler for POST request.
  * @method put($path, \Closure $closure) Registers handler for PUT request.
- * @method del($path, \Closure $closure) Degisters handler for DEL request.
+ * @method delete($path, \Closure $closure) Degisters handler for DELETE request.
  *
  * @package Blanket
  */
@@ -72,10 +72,13 @@ class App {
   private function registerStorageModels() {
     /** @var Db $storage */
     $storage = $this->config['storage'];
+    $schema_registry = [];
     foreach ($this->config['models'] as $class_name) {
-      $storage->registerSchema($class_name);
+      /** @var Model $class_name */
+      $schema_registry[$class_name::getTable()] = $class_name::registerSchema();
       $class_name::$storage = $storage;
     }
+    $storage->setSchemaRegistry($schema_registry);
   }
 
   /**

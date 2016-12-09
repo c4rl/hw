@@ -31,7 +31,7 @@ $app->put('muppets/:id', function ($id, Request $request) {
     ->getAttributes();
 });
 
-$app->del('muppets/:id', function ($id, Request $request) {
+$app->delete('muppets/:id', function ($id, Request $request) {
   return Muppet::findOrFail($id)
     ->delete()
     ->getAttributes();

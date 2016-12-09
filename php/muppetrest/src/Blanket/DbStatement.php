@@ -154,7 +154,16 @@ abstract class DbStatement {
   protected function bindPlaceholders() {
     $schema = $this->getSchema();
     foreach ($this->placeholders as $data) {
-      $type = $schema[$data['name']]['type'];
+      switch ($schema[$data['name']]['type']) {
+
+        case 'int':
+          $type = \PDO::PARAM_INT;
+          break;
+
+        default:
+          $type = \PDO::PARAM_STR;
+          break;
+      }
       $this->statement->bindValue($data['placeholder'], $data['value'], $type);
     }
 

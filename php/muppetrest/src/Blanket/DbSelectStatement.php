@@ -53,7 +53,10 @@ class DbSelectStatement extends DbStatement {
    *   Results as associative arrays.
    */
   public function executeAndFetchAll() {
-    return $this->execute() ? $this->statement->fetchAll(\PDO::FETCH_ASSOC) : [];
+    $rows = $this->execute() ? $this->statement->fetchAll(\PDO::FETCH_ASSOC) : [];
+
+    $db = $this->db;
+    return $db::coerceRecords($rows, $this->getSchema());
   }
 
 }
