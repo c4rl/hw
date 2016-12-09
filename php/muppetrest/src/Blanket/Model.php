@@ -40,6 +40,11 @@ class Model {
    */
   public static $storage;
 
+  /**
+   * Schema definition.
+   *
+   * @var array
+   */
   public static $schema;
 
   /**
@@ -77,6 +82,7 @@ class Model {
    *   Attributes.
    */
   public function __construct(array $attributes = []) {
+    static::registerSchema();
     $this->original_attributes = $this->attributes = static::coerceAttributes($attributes, static::$schema);
   }
 
