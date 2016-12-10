@@ -6,11 +6,18 @@
             "email": "carl.wiedemann@gmail.com"
         }
     ],
-    "require": {},
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/c4rl/blanket"
+        }
+    ],
+    "require": {
+        "c4rl/blanket": "*"
+    },
     "autoload": {
         "psr-4": {
             "Muppet\\": "model/",
-            "Blanket\\": "src/Blanket/"
         }
     },
     "require-dev": {
