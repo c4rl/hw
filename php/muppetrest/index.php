@@ -15,4 +15,6 @@ $config = [
   'storage' => (new Db(sprintf('sqlite:%s/storage/db.sqlite', __DIR__))),
 ];
 
-(new App($config))->run(Request::createFromGlobals());
+$app = new App($config);
+
+$app->run(Request::createFromGlobals());
