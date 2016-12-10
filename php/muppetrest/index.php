@@ -1,7 +1,7 @@
 <?php
 
 use Blanket\App;
-use Blanket\Db;
+use Blanket\Db\Db;
 use Blanket\Request;
 use Muppet\Muppet;
 

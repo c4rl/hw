@@ -1,13 +1,15 @@
 <?php
 
-namespace Blanket;
+namespace Blanket\Db;
+
+use Blanket\Storage\DeleteStatementInterface;
 
 /**
  * Class DbDeleteStatement.
  *
  * @package Blanket
  */
-class DbDeleteStatement extends DbStatement {
+class DbDeleteStatement extends AbstractDbStatement implements DeleteStatementInterface {
 
   /**
    * {@inheritdoc}

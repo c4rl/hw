@@ -3,6 +3,7 @@
 namespace Blanket;
 
 use Blanket\Exception\RecordNotFoundException;
+use Blanket\Storage\StorageInterface;
 
 /**
  * Class Model.
@@ -36,7 +37,7 @@ class Model {
   /**
    * Storage mechanism.
    *
-   * @var Db
+   * @var StorageInterface
    */
   public static $storage;
 

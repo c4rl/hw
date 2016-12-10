@@ -1,13 +1,15 @@
 <?php
 
-namespace Blanket;
+namespace Blanket\Db;
+
+use Blanket\Storage\UpdateStatementInterface;
 
 /**
  * Class DbUpdateStatement.
  *
  * @package Blanket
  */
-class DbUpdateStatement extends DbStatement {
+class DbUpdateStatement extends AbstractDbStatement implements UpdateStatementInterface {
 
   /**
    * {@inheritdoc}

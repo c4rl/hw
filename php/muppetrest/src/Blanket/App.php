@@ -4,6 +4,7 @@ namespace Blanket;
 
 use Blanket\Exception\Http500Exception;
 use Blanket\Exception\MissingRouteException;
+use Blanket\Storage\StorageInterface;
 
 /**
  * Class App.
@@ -82,7 +83,7 @@ class App {
    * Registers models with the storage mechanism.
    */
   private function registerStorageModels() {
-    /** @var Db $storage */
+    /** @var StorageInterface $storage */
     $storage = $this->config['storage'];
     $schema_registry = [];
     foreach ($this->config['models'] as $class_name) {

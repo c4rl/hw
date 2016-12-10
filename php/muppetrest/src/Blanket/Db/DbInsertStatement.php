@@ -1,13 +1,15 @@
 <?php
 
-namespace Blanket;
+namespace Blanket\Db;
+
+use Blanket\Storage\InsertStatementInterface;
 
 /**
  * Class DbInsertStatement.
  *
  * @package Blanket
  */
-class DbInsertStatement extends DbStatement {
+class DbInsertStatement extends AbstractDbStatement implements InsertStatementInterface {
 
   /**
    * {@inheritdoc}

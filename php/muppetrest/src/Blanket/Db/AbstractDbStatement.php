@@ -1,13 +1,15 @@
 <?php
 
-namespace Blanket;
+namespace Blanket\Db;
+
+use Blanket\Storage\StorageStatementInterface;
 
 /**
- * Class DbStatement.
+ * Class AbstractDbStatement.
  *
  * @package Blanket
  */
-abstract class DbStatement {
+abstract class AbstractDbStatement implements StorageStatementInterface {
 
   /**
    * Storage mechanism.
@@ -52,7 +54,7 @@ abstract class DbStatement {
   protected $conditions = [];
 
   /**
-   * DbStatement constructor.
+   * AbstractDbStatement constructor.
    *
    * @param string $table
    *   Name of primary table on which to execute statement.

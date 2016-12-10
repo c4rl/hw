@@ -1,6 +1,9 @@
 <?php
 
-namespace Blanket;
+namespace Blanket\Db;
+
+use Blanket\SchemaTrait;
+use Blanket\Storage\StorageInterface;
 
 /**
  * Class Db.
@@ -9,7 +12,7 @@ namespace Blanket;
  *
  * @package Blanket
  */
-class Db {
+class Db implements StorageInterface {
   use SchemaTrait;
 
   /**
@@ -52,6 +55,12 @@ class Db {
     return $this->schema_registry[$table];
   }
 
+  /**
+   * Sets the schema registry in order to later bind placeholder types.
+   *
+   * @param array $registry
+   *   Array, keyed by column name, of arrays with `name` and `type`.
+   */
   public function setSchemaRegistry($registry) {
     $this->schema_registry = $registry;
   }

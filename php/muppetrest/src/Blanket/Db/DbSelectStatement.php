@@ -1,13 +1,15 @@
 <?php
 
-namespace Blanket;
+namespace Blanket\Db;
+
+use Blanket\Storage\SelectStatementInterface;
 
 /**
  * Class DbSelectStatement.
  *
  * @package Blanket
  */
-class DbSelectStatement extends DbStatement {
+class DbSelectStatement extends AbstractDbStatement implements SelectStatementInterface {
 
   /**
    * SQL limit string.
@@ -34,7 +36,6 @@ class DbSelectStatement extends DbStatement {
     return $this;
   }
 
-
   /**
    * {@inheritdoc}
    */
@@ -56,6 +57,8 @@ class DbSelectStatement extends DbStatement {
     $rows = $this->execute() ? $this->statement->fetchAll(\PDO::FETCH_ASSOC) : [];
 
     $db = $this->db;
+    // @todo Remove this. We shouldn't be making up for shortcomings in the
+    // storage library in the application layer.
     return $db::coerceRecords($rows, $this->getSchema());
   }
 
