@@ -1,6 +1,6 @@
 var chakram = require('chakram'), expect = chakram.expect;
 
-var URL = 'http://muppets.localhost:8080';
+var URL = 'http://blanket-example.localhost:8080';
 
 describe('Muppets errwhere', function() {
 
