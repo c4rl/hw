@@ -2,7 +2,6 @@
 
 namespace Blanket\Db;
 
-use Blanket\SchemaTrait;
 use Blanket\Storage\StorageInterface;
 
 /**
@@ -13,7 +12,6 @@ use Blanket\Storage\StorageInterface;
  * @package Blanket
  */
 class Db implements StorageInterface {
-  use SchemaTrait;
 
   /**
    * Wrapped PDO instance.

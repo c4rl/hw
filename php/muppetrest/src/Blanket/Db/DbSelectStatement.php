@@ -54,12 +54,7 @@ class DbSelectStatement extends AbstractDbStatement implements SelectStatementIn
    *   Results as associative arrays.
    */
   public function executeAndFetchAll() {
-    $rows = $this->execute() ? $this->statement->fetchAll(\PDO::FETCH_ASSOC) : [];
-
-    $db = $this->db;
-    // @todo Remove this. We shouldn't be making up for shortcomings in the
-    // storage library in the application layer.
-    return $db::coerceRecords($rows, $this->getSchema());
+    return $this->execute() ? $this->statement->fetchAll(\PDO::FETCH_ASSOC) : [];
   }
 
 }

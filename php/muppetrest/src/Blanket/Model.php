@@ -11,7 +11,6 @@ use Blanket\Storage\StorageInterface;
  * @package Blanket
  */
 class Model {
-  use SchemaTrait;
 
   /**
    * Array of attributes.
@@ -49,31 +48,13 @@ class Model {
   public static $schema;
 
   /**
-   * Registers schema of given model class name.
+   * Returns table name for model storage.
    *
-   * @param string $model_class_name
-   *   FQCN of model class.
-   *
-   * @return array
-   *   Schema array keyed by field with 'name' and 'type'.
+   * @return string
+   *   Table name.
    */
-  public static function registerSchema() {
-    if (isset(static::$schema)) return static::$schema;
-
-    $reflection = new \ReflectionClass(get_called_class());
-    $lines = explode(PHP_EOL, $reflection->getDocComment());
-
-    return static::$schema = array_reduce($lines, function (array $schema, $line) {
-
-      $matches = [];
-      if (preg_match('/^\* @property ([^ ]+) ([^ ]+) ?.*$/', trim($line), $matches)) {
-        $name = preg_replace('/[^a-z]/i', '', $matches[2]);
-        $type = $matches[1];
-        $schema[$name] = compact('name', 'type');
-      }
-
-      return $schema;
-    }, []);
+  public static function getTable() {
+    return static::$table;
   }
 
   /**
@@ -84,19 +65,8 @@ class Model {
    */
   public function __construct(array $attributes = []) {
     static::registerSchema();
-    $this->original_attributes = $this->attributes = static::coerceAttributes($attributes, static::$schema);
+    $this->original_attributes = $this->attributes = self::coerceAttributes($attributes);
   }
-
-  /**
-   * Returns table name for model storage.
-   *
-   * @return string
-   *   Table name.
-   */
-  public static function getTable() {
-    return static::$table;
-  }
-
   /**
    * Getter for attribute.
    *
@@ -120,7 +90,7 @@ class Model {
    *   Attribute value to set.
    */
   public function __set($name, $value) {
-    $this->attributes[$name] = self::coerceType($name, $value, static::$schema);
+    $this->attributes[$name] = self::coerceType($name, $value);
   }
 
   /**
@@ -291,6 +261,80 @@ class Model {
     }
 
     return $instances;
+  }
+
+  /**
+   * Registers schema of given model class name.
+   *
+   * @return array
+   *   Schema array keyed by field with 'name' and 'type'.
+   */
+  public static function registerSchema() {
+    if (isset(static::$schema)) return static::$schema;
+
+    $reflection = new \ReflectionClass(get_called_class());
+    $lines = explode(PHP_EOL, $reflection->getDocComment());
+
+    return static::$schema = array_reduce($lines, function (array $schema, $line) {
+
+      $matches = [];
+      if (preg_match('/^\* @property ([^ ]+) ([^ ]+) ?.*$/', trim($line), $matches)) {
+        $name = preg_replace('/[^a-z]/i', '', $matches[2]);
+        $type = $matches[1];
+        $schema[$name] = compact('name', 'type');
+      }
+
+      return $schema;
+    }, []);
+  }
+
+  /**
+   * Coerces attributes to specified types.
+   *
+   * @param array $attributes
+   *   Attributes.
+   *
+   * @return array
+   *   Coerced attributes.
+   */
+  private static function coerceAttributes(array $attributes) {
+    $coerced_attributes = [];
+    foreach ($attributes as $name => $value) {
+      $coerced_attributes[$name] = self::coerceType($name, $value);
+    }
+    return $coerced_attributes;
+  }
+
+  /**
+   * Coerces variable to specified type.
+   *
+   * @param string $name
+   *   Name of column.
+   * @param mixed $value
+   *   Value of column.
+   *
+   * @return mixed
+   *   Coerced value.
+   */
+  private static function coerceType($name, $value) {
+    switch (static::$schema[$name]['type']) {
+      case 'bool':
+        $coerced_value = (bool) $value;
+        break;
+
+      case 'int':
+        $coerced_value = (int) $value;
+        break;
+
+      case 'string':
+        $coerced_value = (string) $value;
+        break;
+
+      default:
+        throw new \DomainException();
+    }
+
+    return $coerced_value;
   }
 
 }
