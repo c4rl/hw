@@ -55,11 +55,28 @@ trait SchemaTrait {
    * @param array $schema
    *   Schema definition.
    *
-   * @return int|string
+   * @return mixed
    *   Coerced value.
    */
   public static function coerceType($name, $value, array $schema) {
-    return $schema[$name]['type'] == 'int' ? (int) $value : (string) $value;
+    switch ($schema[$name]['type']) {
+      case 'bool':
+        $coerced_value = (bool) $value;
+        break;
+
+      case 'int':
+        $coerced_value = (int) $value;
+        break;
+
+      case 'string':
+        $coerced_value = (string) $value;
+        break;
+
+      default:
+        throw new \DomainException();
+    }
+
+    return $coerced_value;
   }
 
 }
