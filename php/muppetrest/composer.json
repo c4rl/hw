@@ -13,14 +13,11 @@
         }
     ],
     "require": {
-        "c4rl/blanket": "*"
+        "c4rl/blanket": "dev-master"
     },
     "autoload": {
         "psr-4": {
-            "Muppet\\": "model/",
+            "Muppet\\": "model/"
         }
-    },
-    "require-dev": {
-        "phpspec/phpspec": "3.2.0"
     }
 }
