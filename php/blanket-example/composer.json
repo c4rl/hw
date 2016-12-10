@@ -1,5 +1,5 @@
 {
-    "name": "c4rl/muppetrest",
+    "name": "c4rl/blanket-example",
     "authors": [
         {
             "name": "Carl Wiedemann",
@@ -17,7 +17,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Muppet\\": "model/"
+            "App\\": "model/"
         }
     }
 }
