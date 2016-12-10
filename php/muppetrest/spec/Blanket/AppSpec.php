@@ -34,11 +34,15 @@ class AppSpec extends ObjectBehavior {
     $this->put('path', function () {})->shouldReturn(NULL);
   }
 
-  function it_should_have_del_register() {
-    $this->shouldThrow('ArgumentCountError')->duringDel();
-    $this->shouldThrow('ArgumentCountError')->duringDel('path');
-    $this->shouldThrow('TypeError')->duringDel('path', 'foo');
-    $this->del('path', function () {})->shouldReturn(NULL);
+  function it_should_have_delete_register() {
+    $this->shouldThrow('ArgumentCountError')->duringDelete();
+    $this->shouldThrow('ArgumentCountError')->duringDelete('path');
+    $this->shouldThrow('TypeError')->duringDelete('path', 'foo');
+    $this->delete('path', function () {})->shouldReturn(NULL);
+  }
+
+  function it_should_not_register_unsupported_methods() {
+    $this->shouldThrow('BadMethodCallException')->duringPatch();
   }
 
   function it_should_respond(Request $request) {

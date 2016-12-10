@@ -18,6 +18,18 @@ use Blanket\Exception\MissingRouteException;
 class App {
 
   /**
+   * Supported HTTP methods.
+   *
+   * @var array
+   */
+  const SUPPORTED_METHODS = [
+    'get',
+    'post',
+    'put',
+    'delete',
+  ];
+
+  /**
    * Key-value storage of configuration.
    *
    * @var array
@@ -97,6 +109,10 @@ class App {
    *   If path and callback aren't properly passed.
    */
   public function __call($method, array $arguments) {
+
+    if (!in_array($method, self::SUPPORTED_METHODS)) {
+      throw new \BadMethodCallException();
+    }
 
     if (count($arguments) != 2) {
       throw new \ArgumentCountError();
